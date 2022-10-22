@@ -1,6 +1,7 @@
 package middleware
 
 import (
+	"fmt"
 	"ginblog/utils"
 	"ginblog/utils/errmsg"
 	"github.com/gin-gonic/gin"
@@ -81,6 +82,8 @@ func JwtToken() gin.HandlerFunc {
 			c.Abort()
 			return
 		}
+		a := 23
+		fmt.Printf("%d", a)
 		if time.Now().Unix() > key.ExpiresAt.Unix() {
 			code = errmsg.ErrorTokenRuntime
 			c.JSON(http.StatusOK, gin.H{

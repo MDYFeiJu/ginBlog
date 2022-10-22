@@ -15,6 +15,7 @@ type Article struct {
 	Img     string `gorm:"type:varchar(100)" json:"img"`
 }
 
+// CreateArt 创建文章
 func CreateArt(data *Article) int {
 	if CheckArt(data.Title) == errmsg.ErrorExistArticle {
 		return errmsg.ErrorExistArticle

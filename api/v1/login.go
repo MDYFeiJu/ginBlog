@@ -17,6 +17,7 @@ func Login(c *gin.Context) {
 		token, _ = middleware.SetToken(data.Username)
 	}
 	c.JSON(http.StatusOK, gin.H{
+
 		"status":  code,
 		"message": errmsg.GetErrMsg(code),
 		"token":   token,

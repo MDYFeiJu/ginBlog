@@ -25,6 +25,7 @@ func init() {
 	}
 	LoadServer(file)
 	LoadData(file)
+
 }
 func LoadServer(file *ini.File) {
 	AppMode = file.Section("server").Key("AppMode").MustString("debug")
