@@ -33,12 +33,13 @@ func GetUsers(c *gin.Context) {
 	if pageNum == 0 {
 		pageNum = -1
 	}
-	users := model.GetUsers(pageSize, pageNum)
+	users, cnt := model.GetUsers(pageSize, pageNum)
 	code := errmsg.SUCCESS
 	c.JSON(http.StatusOK, gin.H{
 		"status":  code,
 		"data":    users,
 		"message": errmsg.GetErrMsg(code),
+		"total":   cnt,
 	})
 }
 

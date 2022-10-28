@@ -1,6 +1,7 @@
 package model
 
 import (
+	"fmt"
 	"ginblog/utils/errmsg"
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
@@ -35,8 +36,10 @@ func CheckUser(name string) int {
 }
 
 // GetUsers 获取用户列表
-func GetUsers(pageSize int, pageNum int) []User {
+func GetUsers(pageSize int, pageNum int) ([]User, int64) {
 	var users []User
+	var count int64
+	err = db.Find(&users).Count(&count).Error
 	if pageNum == -1 {
 		err = db.Limit(pageSize).Offset(-1).Find(&users).Error
 	} else {
@@ -44,14 +47,15 @@ func GetUsers(pageSize int, pageNum int) []User {
 	}
 
 	if err != nil && err != gorm.ErrRecordNotFound {
-		return nil
+		return nil, 0
 	}
-	return users
+	return users, count
 }
 
 // BcryptPw 用户密码加密
 func BcryptPw(pw string) string {
 	b := []byte(pw)
+	fmt.Printf("%v", b)
 	password, err := bcrypt.GenerateFromPassword(b, bcrypt.DefaultCost)
 	if err != nil {
 		log.Fatal(err)
@@ -81,17 +85,29 @@ func EditUser(id int, data *User) int {
 	return errmsg.SUCCESS
 }
 
+func ValidatePasswords(hashedPwd string, plainPwd string) bool {
+	byteHash := []byte(hashedPwd)
+	bytePlain := []byte(plainPwd)
+	err := bcrypt.CompareHashAndPassword(byteHash, bytePlain)
+	fmt.Printf("%v", err)
+	if err != nil {
+		return false
+	}
+	return true
+}
+
 func CheckLogin(name, password string) int {
 	var user User
 	db.Where("username=?", name).First(&user)
 	if user.ID == 0 {
 		return errmsg.ErrorUserNotExist
 	}
-	if BcryptPw(password) != user.Password {
+	if !ValidatePasswords(user.Password, password) {
 		return errmsg.ErrorPasswordWrong
 	}
-	if user.Role != 0 {
-		return errmsg.UserNoRight
-	}
+
+	//if user.Role != 0 {
+	//	return errmsg.UserNoRight
+	//}
 	return errmsg.SUCCESS
 }
